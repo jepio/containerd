@@ -27,7 +27,7 @@ require (
 	github.com/docker/go-metrics v0.0.1
 	github.com/docker/go-units v0.4.0
 	github.com/emicklei/go-restful v2.9.5+incompatible
-	github.com/fsnotify/fsnotify v1.4.9
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gogo/googleapis v1.4.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.5.6
@@ -79,6 +79,7 @@ require (
 
 // When updating replace rules, make sure to also update the rules in integration/client/go.mod and api/go.mod
 replace (
+	github.com/containerd/cgroups => github.com/jepio/cgroups v1.0.3-0.20211202095137-139b29c7614d
 	// prevent transitional dependencies due to containerd having a circular
 	// dependency on itself through plugins. see .empty-mod/go.mod for details
 	github.com/containerd/containerd => ./.empty-mod/

@@ -37,6 +37,7 @@ func New(publisher shim.Publisher) (oom.Watcher, error) {
 	return &watcher{
 		itemCh:    make(chan item),
 		publisher: publisher,
+		quit:      make(chan error),
 	}, nil
 }
 
@@ -44,6 +45,7 @@ func New(publisher shim.Publisher) (oom.Watcher, error) {
 type watcher struct {
 	itemCh    chan item
 	publisher shim.Publisher
+	quit      chan error
 }
 
 type item struct {
@@ -54,6 +56,7 @@ type item struct {
 
 // Close closes the watcher
 func (w *watcher) Close() error {
+	close(w.quit)
 	return nil
 }
 
@@ -91,9 +94,7 @@ func (w *watcher) Add(id string, cgx interface{}) error {
 	if !ok {
 		return errors.Errorf("expected *cgroupsv2.Manager, got: %T", cgx)
 	}
-	// FIXME: cgroupsv2.Manager does not support closing eventCh routine currently.
-	// The routine shuts down when an error happens, mostly when the cgroup is deleted.
-	eventCh, errCh := cg.EventChan()
+	eventCh, errCh, quitCh := cg.EventChan()
 	go func() {
 		for {
 			i := item{id: id}
@@ -106,6 +107,10 @@ func (w *watcher) Add(id string, cgx interface{}) error {
 				w.itemCh <- i
 				// we no longer get any event/err when we got an err
 				logrus.WithError(err).Warn("error from *cgroupsv2.Manager.EventChan")
+				close(quitCh)
+				return
+			case <-w.quit:
+				close(quitCh)
 				return
 			}
 		}
