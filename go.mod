@@ -79,7 +79,7 @@ require (
 
 // When updating replace rules, make sure to also update the rules in integration/client/go.mod and api/go.mod
 replace (
-	github.com/containerd/cgroups => github.com/jepio/cgroups v1.0.3-0.20211202095137-139b29c7614d
+	github.com/containerd/cgroups => github.com/jepio/cgroups v1.0.3-0.20211203125206-e551c45b5808
 	// prevent transitional dependencies due to containerd having a circular
 	// dependency on itself through plugins. see .empty-mod/go.mod for details
 	github.com/containerd/containerd => ./.empty-mod/
